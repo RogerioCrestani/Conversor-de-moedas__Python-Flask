@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %} Conversor monetário {% endblock %}
+
+{% block content %}
+<div class="container">
+    <form method="post" action="/" class="row">
+
+        <div class="col-md-6 mb-3">
+            <label for="quantity_coin_1" class="form-label">Quantidade</label>
+            <input name="quantity_coin_1" id="quantity_coin_1" class="form-control" type="number" value="1" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="coins" class="form-label">Moedas</label>
+            <select id="coins" name="coins" class="form-select">
+                {% for key, value in coins.items() %}
+                <option value={{ key }}>{{ key }}: {{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12 my-4">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg" type="submit">Calcular</button>
+            </div>
+        </div>
+    </form>
+    <div class="row my-4">
+        <div class="badge bg-secondary">
+            <div class="row">
+                <div class="col-md-5 d-grid gap-2 my-2">
+                    <div class="badge bg-primary">
+                        <h2>{{value_coin['quantity_coin_1']}} {{value_coin['coin_1']}}</h2>
+                    </div>
+                </div>
+                <div class="col-md-2 d-grid gap-2 my-2">
+                    <div class="badge bg-success">
+                        <h2>=</h2>
+                    </div>
+                </div>
+                <div class="col-md-5 d-grid gap-2 my-2">
+                    <div class="badge bg-primary text-wrap">
+                        <h2>{{value_coin['quantity_coin_2']}} {{value_coin['coin_2']}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

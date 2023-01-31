@@ -1,32 +1,64 @@
 import os
-
-from flask import Flask
-
+from . import api
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 def create_app(test_config=None):
-    # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
 
     if test_config is None:
-        # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
     else:
-        # load the test config if passed in
         app.config.from_mapping(test_config)
 
-    # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
+                
+    @app.route('/', methods=('GET', 'POST'))
+    def index():
+        #coins = None
+        #value_coin = None
 
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
+        value_coin = {
+            'coin_1': '',
+                'coin_2': '',
+                'quantity_coin_1': '',
+                'quantity_coin_2':  ''
+            }
+
+        coins = {}
+
+        try:
+            value_coin = 0
+            if request.method == 'POST':
+                quantity_coin_1 = request.form['quantity_coin_1']
+                coins_comb = request.form['coins']
+            else:
+                quantity_coin_1 = 1
+                coins_comb = 'USD-BRL'
+
+            coin_name = api.request_coin_value(coins_comb)['name']
+            coin_1 = coin_name[:coin_name.find('/')]
+            coin_2 = coin_name[coin_name.find('/')+1:]
+
+            coin_bid = api.request_coin_value(coins_comb)['bid']
+            quantity_coin_2 = round((float(coin_bid) * float(quantity_coin_1)), 2)
+
+            value_coin = {
+                'coin_1': coin_1,
+                'coin_2': coin_2,
+                'quantity_coin_1': quantity_coin_1,
+                'quantity_coin_2':  quantity_coin_2
+            }
+
+            coins = api.request_coins()
+        except Exception as error:
+            flash(f'Ocorreu um erro inesperado. Por gentileza recarregue a pagina! Erro: {error} ')
+
+        return render_template('main/index.html', coins=coins, value_coin=value_coin)
 
     return app
